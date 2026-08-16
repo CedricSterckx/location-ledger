@@ -79,6 +79,14 @@ document.querySelector('.filters').addEventListener('click', e => { const button
 elements.campaign.addEventListener('change', async e => { state.campaignId = e.target.value; localStorage.setItem('campaignId', state.campaignId); await loadLocations(); });
 $('#newCampaign').addEventListener('click', () => { elements.form.reset(); elements.dialog.showModal(); setTimeout(() => $('#campaignName').focus(), 50); });
 $('#logout').addEventListener('click', async () => { await api('/api/auth/logout', { method: 'POST' }); location.reload(); });
+$('#togglePassword').addEventListener('click', () => {
+  const input = $('#password');
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  $('#togglePassword').textContent = showing ? 'Show' : 'Hide';
+  $('#togglePassword').setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+  input.focus();
+});
 $('#loginForm').addEventListener('submit', async e => {
   e.preventDefault();
   const button = e.submitter;

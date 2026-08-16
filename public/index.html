@@ -67,7 +67,11 @@
       <h2 id="loginTitle">Enter the password</h2>
       <p>This campaign ledger is shared only with invited party members.</p>
       <label for="password">Campaign password</label>
-      <input id="password" type="password" minlength="12" required autocomplete="current-password">
+      <div class="password-field">
+        <span class="password-icon" aria-hidden="true">◆</span>
+        <input id="password" type="password" minlength="12" required autocomplete="current-password" placeholder="Enter your shared password">
+        <button id="togglePassword" type="button" aria-label="Show password" title="Show password">Show</button>
+      </div>
       <p id="loginError" class="login-error" role="alert"></p>
       <button class="primary login-button" type="submit">Unlock ledger</button>
     </form>

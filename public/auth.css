@@ -8,20 +8,41 @@ body.locked { overflow: hidden; }
 .login-dialog {
   width: min(440px, 100%); text-align: center; padding: 42px;
   border: 1px solid var(--gold2); border-radius: 14px;
-  background: #1c1e18; color: var(--ink); box-shadow: var(--shadow);
+  background: radial-gradient(circle at 50% 0, #2a2b20 0, #1c1e18 45%);
+  color: var(--ink); box-shadow: var(--shadow);
 }
-.login-dialog label { text-align: left; }
+.login-dialog label { text-align: left; margin-bottom: 9px; }
 .lock-sigil {
   width: 58px; height: 58px; border: 1px solid var(--gold2);
   transform: rotate(45deg); display: grid; place-items: center;
   color: var(--gold); font-size: 24px; margin: 0 auto 28px;
 }
 .login-error { min-height: 20px; color: #d9877f !important; margin: 8px 0 !important; }
+.password-field {
+  display: grid; grid-template-columns: 42px 1fr auto; align-items: center;
+  border: 1px solid #45473c; border-radius: 9px; background: #11120f;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025); transition: .18s ease;
+}
+.password-field:focus-within {
+  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(197,163,90,.13), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.password-icon { color: var(--gold); font-size: 10px; opacity: .8; }
+.password-field input {
+  min-width: 0; border: 0; outline: 0; background: transparent;
+  padding: 14px 4px; color: var(--ink); font-size: 15px;
+}
+.password-field input::placeholder { color: #66685f; }
+.password-field button {
+  align-self: stretch; border: 0; border-left: 1px solid #303229;
+  padding: 0 14px; background: transparent; color: var(--gold);
+  font: 600 11px Inter,sans-serif; cursor: pointer;
+}
 .login-button {
   width: 100%; border: 1px solid var(--gold); border-radius: 7px;
   padding: 12px; background: var(--gold); color: #16150f;
-  font-weight: 700; cursor: pointer;
+  font-weight: 700; cursor: pointer; letter-spacing: .02em; transition: .15s ease;
 }
+.login-button:hover { filter: brightness(1.08); transform: translateY(-1px); }
 .login-button:disabled { opacity: .6; cursor: wait; }
 .login-dialog { animation: appear .2s ease-out; }
 @keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
