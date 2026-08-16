@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#171813">
+  <title>Location Ledger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="grain"></div>
+  <header>
+    <div class="brand">
+      <div class="sigil" aria-hidden="true">✦</div>
+      <div><p>Campaign companion</p><h1>Location Ledger</h1></div>
+    </div>
+    <div class="campaign-wrap">
+      <label for="campaign">Campaign</label>
+      <select id="campaign"></select>
+      <button id="newCampaign" class="icon-button" title="New campaign" aria-label="Create campaign">＋</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">THE ROAD AHEAD</span>
+        <h2>Chart your journey.</h2>
+        <p>Discover new places, clear their dangers, and keep the whole party in step.</p>
+      </div>
+      <div class="progress-ring" id="progressRing"><div><strong id="clearedPercent">0%</strong><span>cleared</span></div></div>
+    </section>
+
+    <section class="stats" aria-label="Campaign progress">
+      <article><span class="stat-icon undiscovered">◇</span><div><strong id="undiscoveredCount">101</strong><small>Undiscovered</small></div></article>
+      <article><span class="stat-icon discovered">◈</span><div><strong id="discoveredCount">0</strong><small>Discovered</small></div></article>
+      <article><span class="stat-icon cleared">✓</span><div><strong id="clearedCount">0</strong><small>Cleared</small></div></article>
+    </section>
+
+    <section class="toolbar">
+      <div class="search"><span>⌕</span><input id="search" type="search" placeholder="Search name, number, or coordinates…" autocomplete="off"></div>
+      <div class="filters" role="group" aria-label="Filter locations">
+        <button class="filter active" data-filter="all">All <span id="allCount">101</span></button>
+        <button class="filter" data-filter="undiscovered">Undiscovered</button>
+        <button class="filter" data-filter="discovered">Discovered</button>
+        <button class="filter" data-filter="cleared">Cleared</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="list-heading"><div>Location</div><div>Status</div></div>
+      <div id="locations" class="locations" aria-live="polite"></div>
+      <div id="empty" class="empty" hidden><span>⌕</span><h3>No paths found</h3><p>Try a different search or filter.</p></div>
+    </section>
+  </main>
+
+  <div id="toast" role="status"></div>
+  <dialog id="campaignDialog">
+    <form id="campaignForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <span class="eyebrow">A NEW CHAPTER</span>
+      <h2>Create a campaign</h2>
+      <p>Start a fresh ledger without changing your existing progress.</p>
+      <label for="campaignName">Campaign name</label>
+      <input id="campaignName" maxlength="80" required placeholder="Sunday Night Party">
+      <div class="dialog-actions"><button type="button" class="cancel">Cancel</button><button class="primary" type="submit">Create campaign</button></div>
+    </form>
+  </dialog>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
