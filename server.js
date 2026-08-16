@@ -1,14 +1,21 @@
 import express from 'express';
 import pg from 'pg';
+import crypto from 'node:crypto';
 import { locations } from './src/locations.js';
 
 const { Pool } = pg;
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const databaseUrl = process.env.DATABASE_URL;
+const appPassword = process.env.APP_PASSWORD;
 
-if (!databaseUrl) {
-  console.error('DATABASE_URL is required');
+if (!databaseUrl || !appPassword) {
+  console.error('DATABASE_URL and APP_PASSWORD are required');
+  process.exit(1);
+}
+
+if (appPassword.length < 12) {
+  console.error('APP_PASSWORD must be at least 12 characters');
   process.exit(1);
 }
 
@@ -17,8 +24,46 @@ const pool = new Pool({
   ssl: databaseUrl.includes('localhost') ? false : { rejectUnauthorized: false }
 });
 
+const authToken = crypto.createHmac('sha256', appPassword).update('location-ledger-auth-v1').digest('base64url');
+const loginAttempts = new Map();
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 5;
+
+app.set('trust proxy', 1);
+
+app.use((_req, res, next) => {
+  res.set({
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'no-referrer',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Content-Security-Policy': "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+  });
+  next();
+});
+
 app.use(express.json());
 app.use(express.static('public'));
+
+function parseCookies(header = '') {
+  return Object.fromEntries(header.split(';').map(value => value.trim().split('=').map(decodeURIComponent)).filter(pair => pair.length === 2));
+}
+
+function safeEqual(value, expected) {
+  const actualHash = crypto.createHash('sha256').update(String(value)).digest();
+  const expectedHash = crypto.createHash('sha256').update(String(expected)).digest();
+  return crypto.timingSafeEqual(actualHash, expectedHash);
+}
+
+function isAuthenticated(req) {
+  const token = parseCookies(req.headers.cookie).ledger_auth;
+  return token ? safeEqual(token, authToken) : false;
+}
+
+function requireAuth(req, res, next) {
+  if (!isAuthenticated(req)) return res.status(401).json({ error: 'Authentication required.' });
+  next();
+}
 
 async function migrate() {
   await pool.query(`
@@ -59,6 +104,33 @@ async function migrate() {
 }
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
+
+app.get('/api/auth/session', (req, res) => res.json({ authenticated: isAuthenticated(req) }));
+
+app.post('/api/auth/login', (req, res) => {
+  const key = req.ip;
+  const now = Date.now();
+  const record = loginAttempts.get(key) || { count: 0, since: now };
+  if (now - record.since > ATTEMPT_WINDOW_MS) Object.assign(record, { count: 0, since: now });
+  if (record.count >= MAX_ATTEMPTS) return res.status(429).json({ error: 'Too many attempts. Try again in 15 minutes.' });
+
+  if (!safeEqual(req.body?.password || '', appPassword)) {
+    record.count += 1;
+    loginAttempts.set(key, record);
+    return res.status(401).json({ error: 'Incorrect password.' });
+  }
+
+  loginAttempts.delete(key);
+  res.setHeader('Set-Cookie', `ledger_auth=${authToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000`);
+  res.json({ authenticated: true });
+});
+
+app.post('/api/auth/logout', (_req, res) => {
+  res.setHeader('Set-Cookie', 'ledger_auth=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0');
+  res.json({ authenticated: false });
+});
+
+app.use('/api/campaigns', requireAuth);
 
 app.get('/api/campaigns', async (_req, res, next) => {
   try {
@@ -124,4 +196,3 @@ app.use((error, _req, res, _next) => {
 
 await migrate();
 app.listen(port, '0.0.0.0', () => console.log(`Location tracker listening on ${port}`));
-

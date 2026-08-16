@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/auth.css">
 </head>
 <body>
   <div class="grain"></div>
@@ -21,6 +22,7 @@
       <label for="campaign">Campaign</label>
       <select id="campaign"></select>
       <button id="newCampaign" class="icon-button" title="New campaign" aria-label="Create campaign">＋</button>
+      <button id="logout" class="icon-button logout" title="Lock ledger" aria-label="Lock ledger">⌁</button>
     </div>
   </header>
 
@@ -58,6 +60,18 @@
   </main>
 
   <div id="toast" role="status"></div>
+  <dialog id="loginDialog" class="login-dialog">
+    <form id="loginForm">
+      <div class="lock-sigil" aria-hidden="true">✦</div>
+      <span class="eyebrow">PRIVATE LEDGER</span>
+      <h2>Enter the password</h2>
+      <p>This campaign ledger is shared only with invited party members.</p>
+      <label for="password">Campaign password</label>
+      <input id="password" type="password" minlength="12" required autocomplete="current-password" autofocus>
+      <p id="loginError" class="login-error" role="alert"></p>
+      <button class="primary login-button" type="submit">Unlock ledger</button>
+    </form>
+  </dialog>
   <dialog id="campaignDialog">
     <form id="campaignForm">
       <button type="button" class="close" aria-label="Close">×</button>

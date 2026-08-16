@@ -9,6 +9,14 @@ async function api(path, options) {
   return body;
 }
 
+async function authenticate() {
+  const session = await api('/api/auth/session');
+  if (session.authenticated) return true;
+  $('#loginError').textContent = '';
+  $('#loginDialog').showModal();
+  return false;
+}
+
 function toast(message) {
   const el = $('#toast'); el.textContent = message; el.classList.add('show');
   clearTimeout(toast.timer); toast.timer = setTimeout(() => el.classList.remove('show'), 2200);
@@ -69,7 +77,21 @@ elements.search.addEventListener('input', e => { state.query = e.target.value.tr
 document.querySelector('.filters').addEventListener('click', e => { const button = e.target.closest('[data-filter]'); if (!button) return; document.querySelectorAll('.filter').forEach(b => b.classList.remove('active')); button.classList.add('active'); state.filter = button.dataset.filter; render(); });
 elements.campaign.addEventListener('change', async e => { state.campaignId = e.target.value; localStorage.setItem('campaignId', state.campaignId); await loadLocations(); });
 $('#newCampaign').addEventListener('click', () => { elements.form.reset(); elements.dialog.showModal(); setTimeout(() => $('#campaignName').focus(), 50); });
+$('#logout').addEventListener('click', async () => { await api('/api/auth/logout', { method: 'POST' }); location.reload(); });
+$('#loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const button = e.submitter;
+  button.disabled = true;
+  $('#loginError').textContent = '';
+  try {
+    await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ password: $('#password').value }) });
+    $('#loginDialog').close();
+    $('#password').value = '';
+    await loadCampaigns();
+  } catch (error) { $('#loginError').textContent = error.message; }
+  finally { button.disabled = false; }
+});
 document.querySelectorAll('.close,.cancel').forEach(b => b.addEventListener('click', () => elements.dialog.close()));
 elements.form.addEventListener('submit', async e => { e.preventDefault(); try { await api('/api/campaigns', { method: 'POST', body: JSON.stringify({ name: $('#campaignName').value }) }); elements.dialog.close(); await loadCampaigns(true); toast('Campaign created'); } catch (error) { toast(error.message); } });
 
-loadCampaigns().catch(error => { toast(error.message); elements.locations.innerHTML = '<div class="empty"><h3>Unable to open the ledger</h3><p>Please refresh and try again.</p></div>'; });
+authenticate().then(authenticated => authenticated && loadCampaigns()).catch(error => { toast(error.message); elements.locations.innerHTML = '<div class="empty"><h3>Unable to open the ledger</h3><p>Please refresh and try again.</p></div>'; });
