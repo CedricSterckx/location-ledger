@@ -52,6 +52,25 @@
       </div>
     </section>
 
+    <details class="recent-panel" open>
+      <summary>
+        <div class="recent-heading">
+          <span class="recent-mark" aria-hidden="true">↺</span>
+          <div><span class="eyebrow">LATEST ACTIVITY</span><h2>Recently updated</h2></div>
+        </div>
+        <span class="recent-summary"><span id="recentCount">0 updates</span><span class="chevron">⌄</span></span>
+      </summary>
+      <div class="recent-body">
+        <div class="recent-filters" role="group" aria-label="Filter recent activity">
+          <button class="recent-filter active" data-recent-filter="all">All</button>
+          <button class="recent-filter" data-recent-filter="discovered">Discovered</button>
+          <button class="recent-filter" data-recent-filter="cleared">Done</button>
+        </div>
+        <div id="recentLocations" class="recent-locations"></div>
+        <div id="recentEmpty" class="recent-empty">No matching activity yet.</div>
+      </div>
+    </details>
+
     <section>
       <div class="list-heading"><div>Location</div><div>Status</div></div>
       <div id="locations" class="locations" aria-live="polite"></div>
