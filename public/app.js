@@ -13,7 +13,8 @@ async function authenticate() {
   const session = await api('/api/auth/session');
   if (session.authenticated) return true;
   $('#loginError').textContent = '';
-  $('#loginDialog').showModal();
+  $('#loginOverlay').hidden = false;
+  document.body.classList.add('locked');
   return false;
 }
 
@@ -85,7 +86,8 @@ $('#loginForm').addEventListener('submit', async e => {
   $('#loginError').textContent = '';
   try {
     await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ password: $('#password').value }) });
-    $('#loginDialog').close();
+    $('#loginOverlay').hidden = true;
+    document.body.classList.remove('locked');
     $('#password').value = '';
     await loadCampaigns();
   } catch (error) { $('#loginError').textContent = error.message; }

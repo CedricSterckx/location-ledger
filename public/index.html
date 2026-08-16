@@ -60,18 +60,18 @@
   </main>
 
   <div id="toast" role="status"></div>
-  <dialog id="loginDialog" class="login-dialog">
-    <form id="loginForm">
+  <div id="loginOverlay" class="login-overlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle" hidden>
+    <form id="loginForm" class="login-dialog">
       <div class="lock-sigil" aria-hidden="true">✦</div>
       <span class="eyebrow">PRIVATE LEDGER</span>
-      <h2>Enter the password</h2>
+      <h2 id="loginTitle">Enter the password</h2>
       <p>This campaign ledger is shared only with invited party members.</p>
       <label for="password">Campaign password</label>
-      <input id="password" type="password" minlength="12" required autocomplete="current-password" autofocus>
+      <input id="password" type="password" minlength="12" required autocomplete="current-password">
       <p id="loginError" class="login-error" role="alert"></p>
       <button class="primary login-button" type="submit">Unlock ledger</button>
     </form>
-  </dialog>
+  </div>
   <dialog id="campaignDialog">
     <form id="campaignForm">
       <button type="button" class="close" aria-label="Close">×</button>
